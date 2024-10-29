@@ -1,6 +1,10 @@
 require:
   - rubocop-rake
-  - rubocop-minitest
+  - rubocop-rspec
 
 AllCops:
+  Exclude: 
+    - 'Gemfile'
+    - 'Gemfile.lock'
+    - 'spec/spec_helper.rb'
   NewCops: enable
