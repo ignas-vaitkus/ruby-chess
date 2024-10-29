@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The chess game object
+# The chess game class
 class Chess
   attr_reader :board
 
