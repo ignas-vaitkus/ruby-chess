@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'lib/app'
+require_relative 'lib/chess'
 
-puts App.new.message
+Chess.new.play
