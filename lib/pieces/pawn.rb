@@ -13,7 +13,7 @@ class Pawn < Piece
     front_moves
   end
 
-  def front_moves
+  def front_moves # rubocop:disable Metrics/AbcSize
     moves = []
     direction = color == 'white' ? -1 : 1
 
@@ -27,7 +27,7 @@ class Pawn < Piece
     moves
   end
 
-  def move(destination)
+  def move(destination) # rubocop:disable Metrics/AbcSize
     raise ArgumentError, 'Invalid move' unless moves.include?(destination)
 
     board[position[0]][position[1]] = nil
