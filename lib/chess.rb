@@ -6,13 +6,15 @@ require_relative 'pieces/piece_factory'
 # The chess game class
 class Chess
   attr_reader :board, :display
-  attr_accessor :current_player, :moves, :message, :retries
+  attr_accessor :current_player, :moves, :message, :retries, :kings
 
   def initialize(starting_position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w')
     @board = Array.new(8) { Array.new(8) }
     @display = Display.new(self)
+
     starting_piece_placement, current_player_letter = starting_position.split
     @current_player = current_player_letter == 'w' ? 'white' : 'black'
+    @kings = {}
     @moves = []
     place_pieces(starting_piece_placement)
     @retries = 0
@@ -20,16 +22,24 @@ class Chess
 
   private
 
-  def place_pieces(starting_position) # rubocop:disable Metrics/MethodLength
-    starting_position.split('/').each_with_index do |rank, i|
+  # NOTE: that the starting_position is a string in FEN notation and is not validated
+  def place_pieces(starting_piece_placement)
+    starting_piece_placement.split('/').each_with_index do |rank, i|
       file = 0
-      rank.each_char do |char|
-        if char.match?(/\d/)
-          file += char.to_i
-        else
-          board[i][file] = PieceFactory.create_piece(board, char, [i, file])
-          file += 1
-        end
+      rank.each_char(&parse_fen_row(i, file))
+    end
+  end
+
+  # parse the FEN notation rank and place the pieces on the board
+  def parse_fen_row(rank, file)
+    lambda do |char|
+      if char.match?(/\d/)
+        file += char.to_i
+      else
+        piece = PieceFactory.create_piece(board, char, [rank, file])
+        kings[piece.color] = piece if piece.is_a?(King)
+        board[rank][file] = piece
+        file += 1
       end
     end
   end
