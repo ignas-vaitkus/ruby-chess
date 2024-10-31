@@ -8,12 +8,12 @@ class Chess
   attr_accessor :current_player, :moves, :message, :retries
 
   UPPER_LOWER_BOARD = " abcdefgh\n"
-
-  def initialize(starting_position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
+  def initialize(starting_position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w')
     @board = Array.new(8) { Array.new(8) }
-    @current_player = 'white'
+    starting_piece_placement, current_player_letter = starting_position.split
+    @current_player = current_player_letter == 'w' ? 'white' : 'black'
     @moves = []
-    place_pieces(starting_position)
+    place_pieces(starting_piece_placement)
     @retries = 0
   end
 
