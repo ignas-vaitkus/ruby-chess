@@ -76,10 +76,18 @@ class Chess
     puts "#{current_player.capitalize}, enter your move:\n\n"
   end
 
+  def handle_turn_end
+    self.current_player = current_player == 'white' ? 'black' : 'white'
+    self.retries = 0
+    self.message = nil
+  end
+
   def play_turn
     print_turn_info
     input = gets.chomp
     handle_input?(input)
+    handle_turn_end
+    play_turn
   rescue StandardError => e
     self.retries += 1
     self.message = e
@@ -92,16 +100,24 @@ class Chess
     raise ArgumentError, 'Invalid input, use coordinate notation, for example "A2-A4", "B1-C3", etc.'
   end
 
-  def handle_input?(move)
-    valid_coordinate_notation_move(move)
-    pick_piece(move)
+  def pick_start_and_destination(move)
+    move.split('-').map do |position|
+      [8 - position[1].to_i, position[0].ord - 65]
+    end
   end
 
-  def pick_piece(move)
-    from, = move.split('-')
-    piece = board[8 - from[1].to_i][from[0].ord - 65]
-    raise 'No piece at that position.' if piece.nil?
-    raise 'Not your piece.' if piece.color != current_player
+  def handle_input?(move)
+    valid_coordinate_notation_move(move)
+    start, destination = pick_start_and_destination(move)
+    piece = pick_piece(start)
+    piece.move(destination)
+    moves << input
+  end
+
+  def pick_piece(square)
+    piece = board[square[0]][square[1]]
+    raise ArgumentError, 'No piece at that position.' if piece.nil?
+    raise ArgumentError, 'Not your piece.' if piece.color != current_player
 
     piece
   end

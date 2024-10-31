@@ -44,19 +44,19 @@ describe Chess do
 
   describe 'pick_piece' do
     it 'returns the piece at the given position' do
-      expect(described_class.new.send(:pick_piece, 'E2-E4')).to be_instance_of(Pawn)
+      expect(described_class.new.send(:pick_piece, [6, 4])).to be_instance_of(Pawn)
     end
 
     it 'raises an error if there is no piece at the given position' do
       expect do
-        described_class.new.send(:pick_piece, 'E3-E4')
-      end.to raise_error('No piece at that position.')
+        described_class.new.send(:pick_piece, [5, 4])
+      end.to raise_error(ArgumentError, 'No piece at that position.')
     end
 
     it 'raises an error if the piece at the given position is not the current player\'s' do
       expect do
-        described_class.new.send(:pick_piece, 'E7-E5')
-      end.to raise_error('Not your piece.')
+        described_class.new.send(:pick_piece, [1, 4])
+      end.to raise_error(ArgumentError, 'Not your piece.')
     end
   end
 end
