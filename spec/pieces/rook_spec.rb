@@ -18,4 +18,12 @@ RSpec.describe Rook do
       expect(rook.to_s).to eq('♖')
     end
   end
+
+  describe '#moves' do
+    it 'returns the correct moves for a rook at the edge of the board' do
+      rook = Chess.new('3rk3/8/8/8/8/8/8/4k3 b').board[0][3]
+      expected_moves = [[0, 0], [0, 1], [0, 2], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3]]
+      expect(rook.moves).to match_array(expected_moves)
+    end
+  end
 end

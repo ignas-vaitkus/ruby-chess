@@ -18,4 +18,16 @@ RSpec.describe King do
       expect(king.to_s).to eq('♔')
     end
   end
+
+  describe '#check_for_check' do
+    it 'returns true if the king is in check' do
+      king = Chess.new('3rk3/8/8/8/3K4/8/8/8 w').kings['white']
+      expect(king.check_for_check?).to be true
+    end
+
+    it 'returns false if the king is not in check' do
+      king = Chess.new('4k3/8/8/8/8/8/8/4K3 b').kings['black']
+      expect(king.check_for_check?).to be false
+    end
+  end
 end
