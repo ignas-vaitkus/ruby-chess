@@ -5,12 +5,16 @@ require_relative 'pieces/piece_factory'
 # The chess game class
 class Chess
   attr_reader :board
+  attr_accessor :current_player, :moves, :message, :retries
 
   UPPER_LOWER_BOARD = " abcdefgh\n"
 
   def initialize(starting_position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')
     @board = Array.new(8) { Array.new(8) }
+    @current_player = 'white'
+    @moves = []
     place_pieces(starting_position)
+    @retries = 0
   end
 
   # '♖♘♗♕♔♗♘♖
@@ -69,16 +73,31 @@ class Chess
     puts "\n\nWelcome to Chess!\n\n"
   end
 
+  def print_turn_info
+    if retries.positive? || !moves.empty?
+      system('clear')
+      puts "\n\n\n\n"
+    end
+    puts board_to_s
+    puts "\n"
+    puts message || "\n"
+    puts "\n"
+    puts "#{current_player.capitalize}, enter your move:\n\n"
+  end
+
+  def play_turn
+    print_turn_info
+  rescue StandardError => e
+    self.retries += 1
+    self.message = e
+    retry
+  end
+
   public
 
   def play
     print_begining
-    puts board_to_s
 
-    puts "\n\n"
-
-    puts "Enter your move:\n\n"
-
-    gets.chomp
+    play_turn
   end
 end
