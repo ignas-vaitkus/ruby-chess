@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# require 'minitest/autorun'
+require 'rspec'
 require_relative '../lib/chess'
 
 describe Chess do
