@@ -17,15 +17,6 @@ class Chess
     @retries = 0
   end
 
-  # '♖♘♗♕♔♗♘♖
-  # ♙♙♙♙♙♙♙♙
-  # ■□■□■□■□
-  # □■□■□■□■
-  # ■□■□■□■□
-  # □■□■□■□■
-  # ♟♟♟♟♟♟♟♟
-  # ♜♞♝♛♚♝♞♜'
-
   private
 
   def place_pieces(starting_position) # rubocop:disable Metrics/MethodLength
