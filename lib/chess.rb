@@ -59,7 +59,7 @@ class Chess
     board_string + UPPER_LOWER_BOARD
   end
 
-  def print_begining
+  def print_beginning
     system('clear')
     puts "\n\nWelcome to Chess!\n\n"
   end
@@ -87,7 +87,7 @@ class Chess
   public
 
   def play
-    print_begining
+    print_beginning
 
     play_turn
   end
