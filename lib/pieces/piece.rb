@@ -2,16 +2,12 @@
 
 # Piece class
 class Piece
-  attr_reader :board
-  attr_accessor :position, :color
+  attr_reader :board, :color
+  attr_accessor :position
 
   def initialize(board, position, color)
     @board = board
     @position = position
     @color = color
-  end
-
-  def move(new_position)
-    @position = new_position
   end
 end
