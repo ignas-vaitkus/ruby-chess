@@ -11,3 +11,5 @@ group :development do
 end
 
 gem "rake", "~> 13.2"
+
+gem "pre-commit", "~> 0.40.0", require: false, :group => :development

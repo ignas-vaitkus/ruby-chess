@@ -1,0 +1,7 @@
+---
+:checks_remove:
+- :yaml
+:checks_add:
+- :whitespace
+- :ci
+- :rubocop

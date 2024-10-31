@@ -3,6 +3,7 @@ require 'rspec/core/rake_task'
 
 task default: %w[lint spec]
 
+desc 'This task runs the linter'
 RuboCop::RakeTask.new(:lint) do |task|
   task.requires << 'rubocop-rspec'
   task.requires << 'rubocop-rake'
@@ -19,3 +20,6 @@ desc 'This task runs tests'
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'spec/**/*_spec.rb'
 end
+
+desc 'This task will be run by pre-commit hook'
+task 'pre_commit:ci': :default
