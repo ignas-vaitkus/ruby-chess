@@ -69,7 +69,7 @@ class Chess
     start, destination = pick_start_and_destination(move)
     piece = pick_piece(start)
     piece.move(destination)
-    moves << [destination, move, piece]
+    moves << { destination: destination, move: move, piece: piece }
   end
 
   def pick_piece(square)
