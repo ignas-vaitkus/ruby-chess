@@ -53,6 +53,14 @@ RSpec.describe Pawn do
     end
   end
 
+  describe '#diagonal_moves' do
+    it 'returns the correct moves for a white pawn that can take' do
+      chess = Chess.new('4k3/8/8/4p3/3P4/8/8/4K3 w')
+      pawn = chess.board[4][3]
+      expect(pawn.diagonal_moves).to eq([[3, 4]])
+    end
+  end
+
   describe '#move' do
     it 'raises an error if the move is invalid' do
       pawn = described_class.new(chess, [6, 1], 'white')
@@ -63,6 +71,12 @@ RSpec.describe Pawn do
       pawn = described_class.new(chess, [6, 1], 'white')
       pawn.move([5, 1])
       expect(chess.board[5][1]).to eq(pawn)
+    end
+
+    it 'sets the pawn position correctly' do
+      pawn = described_class.new(chess, [6, 1], 'white')
+      pawn.move([5, 1])
+      expect(pawn.position).to eq([5, 1])
     end
   end
 end

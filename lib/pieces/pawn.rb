@@ -27,18 +27,22 @@ class Pawn < Piece
     moves
   end
 
-  def diagonal_moves # rubocop:disable Metrics/AbcSize
+  def diagonal_moves # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     moves = []
     direction = color == 'white' ? -1 : 1
 
     [[direction, 1], [direction, -1]].each do |move|
       next if game.board[position[0] + move[0]][position[1] + move[1]].nil?
 
-      if game.board[position[0] + move[0]][position[1] + move[1]].color != color
+      piece = game.board[position[0] + move[0]][position[1] + move[1]]
+
+      if !piece.nil? && piece.color != color
         moves << [position[0] + move[0],
                   position[1] + move[1]]
       end
     end
+
+    moves
   end
 
   def move(destination) # rubocop:disable Metrics/AbcSize
