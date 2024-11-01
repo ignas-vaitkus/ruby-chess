@@ -37,8 +37,16 @@ class King < Piece
     false
   end
 
-  def moves
-    []
+  def moves # rubocop:disable Metrics/AbcSize
+    DIRECTIONS.values.map do |value|
+      checked_position = [position[0] + value[0], position[1] + value[1]]
+      next if checked_position.any? { |coord| coord.negative? || coord > 7 }
+
+      piece = board[checked_position[0]][checked_position[1]]
+      next if piece&.color == color
+
+      checked_position
+    end.compact
   end
 
   def to_s
