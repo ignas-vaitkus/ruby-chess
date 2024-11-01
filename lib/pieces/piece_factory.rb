@@ -9,9 +9,9 @@ require_relative 'king'
 
 # PieceFactory class that instantiates a new class based on the char passed
 class PieceFactory
-  def self.create_piece(board, type, position) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength
+  def self.create_piece(game, type, position) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength
     color = type == type.upcase ? 'white' : 'black'
-    args = [board, position, color]
+    args = [game, position, color]
     case type.downcase
     when 'p'
       Pawn.new(*args)

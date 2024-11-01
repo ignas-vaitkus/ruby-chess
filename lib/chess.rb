@@ -37,7 +37,7 @@ class Chess
       if char.match?(/\d/)
         file += char.to_i
       else
-        piece = PieceFactory.create_piece(board, char, [rank, file])
+        piece = PieceFactory.create_piece(self, char, [rank, file])
         kings[piece.color] = piece if piece.is_a?(King)
         board[rank][file] = piece
         file += 1

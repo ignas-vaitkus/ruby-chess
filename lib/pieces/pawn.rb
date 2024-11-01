@@ -17,9 +17,9 @@ class Pawn < Piece
     moves = []
     direction = color == 'white' ? -1 : 1
 
-    if board[position[0] + direction][position[1]].nil?
+    if game.board[position[0] + direction][position[1]].nil?
       moves << [position[0] + direction, position[1]]
-      if board[position[0] + direction][position[1]].nil? && first_move?
+      if game.board[position[0] + direction][position[1]].nil? && first_move?
         moves << [position[0] + (direction * 2), position[1]]
       end
     end
@@ -32,9 +32,9 @@ class Pawn < Piece
     direction = color == 'white' ? -1 : 1
 
     [[direction, 1], [direction, -1]].each do |move|
-      next if board[position[0] + move[0]][position[1] + move[1]].nil?
+      next if game.board[position[0] + move[0]][position[1] + move[1]].nil?
 
-      if board[position[0] + move[0]][position[1] + move[1]].color != color
+      if game.board[position[0] + move[0]][position[1] + move[1]].color != color
         moves << [position[0] + move[0],
                   position[1] + move[1]]
       end
@@ -44,9 +44,9 @@ class Pawn < Piece
   def move(destination) # rubocop:disable Metrics/AbcSize
     raise ArgumentError, 'Invalid move' unless moves.include?(destination)
 
-    board[position[0]][position[1]] = nil
+    game.board[position[0]][position[1]] = nil
     self.position = destination
-    board[position[0]][position[1]] = self
+    game.board[position[0]][position[1]] = self
   end
 
   def to_s
