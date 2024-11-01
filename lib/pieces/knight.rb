@@ -4,19 +4,16 @@ require_relative 'piece'
 
 # Knight class
 class Knight < Piece
-  def possible_moves # rubocop:disable Metrics/AbcSize
-    x, y = position
-    moves = [
-      [x + 2, y + 1], [x + 2, y - 1],
-      [x - 2, y + 1], [x - 2, y - 1],
-      [x + 1, y + 2], [x + 1, y - 2],
-      [x - 1, y + 2], [x - 1, y - 2]
-    ]
-    moves.select { |move| valid_move?(move) }
-  end
+  def moves # rubocop:disable Metrics/AbcSize
+    KNIGHT_MOVES.map do |move|
+      checked_position = [position[0] + move[0], position[1] + move[1]]
+      next if checked_position.any? { |coord| coord.negative? || coord > 7 }
 
-  def valid_move?(move)
-    move.all? { |coord| coord.between?(0, 7) }
+      piece = board[checked_position[0]][checked_position[1]]
+      next if piece&.color == color
+
+      checked_position
+    end.compact
   end
 
   def to_s
