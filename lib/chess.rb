@@ -6,7 +6,7 @@ require_relative 'pieces/piece_factory'
 # The chess game class
 class Chess
   attr_reader :board, :display
-  attr_accessor :current_player, :moves, :message, :retries, :kings
+  attr_accessor :current_player, :moves, :message, :retries, :kings, :en_passant_square
 
   def initialize(starting_position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w')
     @board = Array.new(8) { Array.new(8) }
@@ -15,6 +15,7 @@ class Chess
     starting_piece_placement, current_player_letter = starting_position.split
     @current_player = current_player_letter == 'w' ? 'white' : 'black'
     @kings = {}
+    @en_passant_square = nil
     @moves = []
     place_pieces(starting_piece_placement)
     @retries = 0
@@ -74,12 +75,20 @@ class Chess
     end
   end
 
-  def handle_input?(move)
+  def handle_input?(move) # rubocop:disable Metrics/AbcSize
     valid_coordinate_notation_move(move)
     start, destination = pick_start_and_destination(move)
     piece = pick_piece(start)
     piece.move(destination)
-    moves << { destination: destination, move: move, piece: piece }
+
+    self.en_passant_square = nil
+
+    # If a pawn moved two squares, set the en passant square
+    if piece.is_a?(Pawn) && (piece.position[0] - start[0]).abs == 2
+      self.en_passant_square = [(destination[0] + start[0]) / 2, destination[1]]
+    end
+
+    moves << { destination: destination, start: start, piece: piece }
   end
 
   def pick_piece(square)
