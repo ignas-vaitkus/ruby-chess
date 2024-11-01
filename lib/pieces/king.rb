@@ -8,10 +8,10 @@ class King < Piece
   def check_for_check? # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
     # Logic to determine if the King is in check
 
-    DIRECTIONS.each_value do |value|
+    DIRECTIONS.each_value do |direction|
       checked_position = position
       loop do
-        checked_position = [checked_position[0] + value[0], checked_position[1] + value[1]]
+        checked_position = [checked_position[0] + direction[0], checked_position[1] + direction[1]]
         break if checked_position.any? { |coord| coord.negative? || coord > 7 }
 
         piece = board[checked_position[0]][checked_position[1]]
@@ -38,8 +38,8 @@ class King < Piece
   end
 
   def moves # rubocop:disable Metrics/AbcSize
-    DIRECTIONS.values.map do |value|
-      checked_position = [position[0] + value[0], position[1] + value[1]]
+    DIRECTIONS.values.map do |direction|
+      checked_position = [position[0] + direction[0], position[1] + direction[1]]
       next if checked_position.any? { |coord| coord.negative? || coord > 7 }
 
       piece = board[checked_position[0]][checked_position[1]]
