@@ -75,7 +75,7 @@ class Chess
     end
   end
 
-  def handle_input?(move) # rubocop:disable Metrics/AbcSize
+  def handle_input(move) # rubocop:disable Metrics/AbcSize
     valid_coordinate_notation_move(move)
     start, destination = pick_start_and_destination(move)
     piece = pick_piece(start)

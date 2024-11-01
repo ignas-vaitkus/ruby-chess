@@ -6,7 +6,7 @@ require_relative '../lib/chess'
 describe Chess do
   subject(:chess) { described_class.new }
 
-  describe 'valid_coordinate_notation_move' do
+  describe '#valid_coordinate_notation_move' do
     it 'returns nil for a valid move' do
       expect(chess.send(:valid_coordinate_notation_move, 'E2-E6')).to be_nil
     end
@@ -18,7 +18,7 @@ describe Chess do
     end
   end
 
-  describe 'pick_piece' do
+  describe '#pick_piece' do
     it 'returns the piece at the given position' do
       expect(chess.send(:pick_piece, [6, 4])).to be_instance_of(Pawn)
     end
@@ -33,6 +33,22 @@ describe Chess do
       expect do
         chess.send(:pick_piece, [1, 4])
       end.to raise_error(ArgumentError, 'Not your piece.')
+    end
+  end
+
+  describe 'en_passant_square' do
+    let(:chess) { described_class.new }
+
+    it 'is set after pawn moves 2 squares' do
+      chess.send(:handle_input, 'E2-E4')
+      expect(chess.en_passant_square).to contain_exactly(5, 4)
+    end
+
+    it 'is set to nil after another piece moves' do
+      chess.send(:handle_input, 'E2-E4')
+      chess.send(:handle_turn_end)
+      chess.send(:handle_input, 'E7-E6')
+      expect(chess.en_passant_square).to be_nil
     end
   end
 end
