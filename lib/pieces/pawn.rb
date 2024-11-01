@@ -10,7 +10,7 @@ class Pawn < Piece
 
   def moves
     # Logic for calculating valid moves for a pawn
-    front_moves
+    [*front_moves, *diagonal_moves]
   end
 
   def front_moves # rubocop:disable Metrics/AbcSize
@@ -25,6 +25,20 @@ class Pawn < Piece
     end
 
     moves
+  end
+
+  def diagonal_moves # rubocop:disable Metrics/AbcSize
+    moves = []
+    direction = color == 'white' ? -1 : 1
+
+    [[direction, 1], [direction, -1]].each do |move|
+      next if board[position[0] + move[0]][position[1] + move[1]].nil?
+
+      if board[position[0] + move[0]][position[1] + move[1]].color != color
+        moves << [position[0] + move[0],
+                  position[1] + move[1]]
+      end
+    end
   end
 
   def move(destination) # rubocop:disable Metrics/AbcSize
