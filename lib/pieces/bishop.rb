@@ -4,8 +4,9 @@ require_relative 'piece'
 
 # Bishop class
 class Bishop < Piece
-  def valid_moves
+  def moves
     # Logic for calculating valid moves for a Bishop
+    DIRECTIONS.slice(:up_left, :up_right, :down_left, :down_right).flat_map(&iterate_direction(true))
   end
 
   def to_s
