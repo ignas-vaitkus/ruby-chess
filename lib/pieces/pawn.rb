@@ -46,19 +46,21 @@ class Pawn < Piece
     moves
   end
 
-  def move(destination) # rubocop:disable Metrics/AbcSize
-    raise ArgumentError, 'Invalid move' unless moves.include?(destination)
+  def take_pawn_by_en_passant(destination)
+    return unless destination == game.en_passant_square
 
-    if destination == game.en_passant_square
-      taken_pawn = game.board[destination[0] - direction][destination[1]]
-      taken_pawn.take
-    end
+    taken_pawn = game.board[destination[0] - direction][destination[1]]
+    taken_pawn&.take
+  end
+
+  def move(destination)
+    raise ArgumentError, 'Invalid move' unless moves_after_check.include?(destination)
+
+    take_pawn_by_en_passant(destination)
 
     game.board[destination[0]][destination[1]]&.take
 
-    game.board[position[0]][position[1]] = nil
-    self.position = destination
-    game.board[position[0]][position[1]] = self
+    move_without_validation(destination)
   end
 
   def to_s

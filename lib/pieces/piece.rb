@@ -49,7 +49,61 @@ class Piece
 
   def take
     game.taken_pieces[color.to_sym] << self
-    game.board[position[0]][position[1]] = nil
+    self.own_square = nil
     self.position = nil
+  end
+
+  def own_square
+    game.board[position[0]][position[1]]
+  end
+
+  def own_square=(square)
+    game.board[position[0]][position[1]] = square
+  end
+
+  def moves
+    []
+  end
+
+  # moves_after_check is used to filter out moves that would leave the king in check
+  def moves_after_check # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+    moves.select do |move|
+      # Check if is an en passant move
+      en_passant_move = is_a?(Pawn) && move == game.en_passant_square
+
+      # Save the current state of the game
+      taken_pawn = game.board[position[0]][move[1]] if en_passant_move
+      destination_square = game.board[move[0]][move[1]]
+      starting_position = position
+
+      # Move the piece and check if the king is in check
+      game.board[position[0]][move[1]] = nil if en_passant_move
+      game.board[starting_position[0]][starting_position[1]] = nil
+      game.board[move[0]][move[1]] = self
+      self.position = move
+      result = !game.kings[color].in_check?
+
+      # Restore the game state
+      game.board[position[0]][move[1]] = taken_pawn if en_passant_move
+      game.board[starting_position[0]][starting_position[1]] = self
+      game.board[move[0]][move[1]] = destination_square
+      self.position = starting_position
+
+      result
+    end
+  end
+
+  def move_without_validation(destination)
+    self.own_square = nil
+    self.position = destination
+    self.own_square = self
+  end
+
+  def move(destination)
+    raise ArgumentError, 'Invalid move' unless moves_after_check.include?(destination)
+
+    game.board[destination[0]][destination[1]]&.take
+
+    move_without_validation(destination)
   end
 end

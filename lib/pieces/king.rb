@@ -5,7 +5,7 @@ require_relative 'piece'
 
 # King class
 class King < Piece
-  def check_for_check? # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
+  def in_check? # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
     # Logic to determine if the King is in check
 
     DIRECTIONS.each_value do |direction|
