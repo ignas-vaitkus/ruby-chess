@@ -6,7 +6,8 @@ require_relative 'pieces/piece_factory'
 # The chess game class
 class Chess
   attr_reader :board, :display
-  attr_accessor :current_player, :moves, :message, :retries, :kings, :en_passant_square
+  attr_accessor :current_player, :moves, :pieces_on_board, :taken_pieces,
+                :message, :retries, :kings, :en_passant_square
 
   def initialize(starting_position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w')
     @board = Array.new(8) { Array.new(8) }
@@ -14,6 +15,9 @@ class Chess
 
     starting_piece_placement, current_player_letter = starting_position.split
     @current_player = current_player_letter == 'w' ? 'white' : 'black'
+
+    @pieces_on_board = { white: [], black: [] }
+    @taken_pieces = { white: [], black: [] }
     @kings = {}
     @en_passant_square = nil
     @moves = []
@@ -32,12 +36,13 @@ class Chess
   end
 
   # parse the FEN notation rank and place the pieces on the board
-  def parse_fen_row(rank, file)
+  def parse_fen_row(rank, file) # rubocop:disable Metrics/MethodLength
     lambda do |char|
       if char.match?(/\d/)
         file += char.to_i
       else
         piece = PieceFactory.create_piece(self, char, [rank, file])
+        pieces_on_board[piece.color.to_sym] << piece
         kings[piece.color] = piece if piece.is_a?(King)
         board[rank][file] = piece
         file += 1
@@ -54,7 +59,7 @@ class Chess
   def play_turn
     display.print_turn_info
     input = gets.chomp
-    handle_input?(input)
+    handle_input(input)
     handle_turn_end
     play_turn
   rescue StandardError => e

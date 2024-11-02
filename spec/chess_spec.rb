@@ -36,7 +36,7 @@ describe Chess do
     end
   end
 
-  describe 'en_passant_square' do
+  describe '.en_passant_square' do
     let(:chess) { described_class.new }
 
     it 'is set after pawn moves 2 squares' do
@@ -49,6 +49,14 @@ describe Chess do
       chess.send(:handle_turn_end)
       chess.send(:handle_input, 'E7-E6')
       expect(chess.en_passant_square).to be_nil
+    end
+
+    it 'allows for en passant capture' do
+      chess = described_class.new('4k3/3p4/8/4P3/8/8/8/4K3 b')
+      chess.send(:handle_input, 'D7-D5')
+      chess.send(:handle_turn_end)
+      chess.send(:handle_input, 'E5-D6')
+      expect(chess.board[3][3]).to be_nil
     end
   end
 end

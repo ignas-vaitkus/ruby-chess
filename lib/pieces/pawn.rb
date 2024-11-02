@@ -8,6 +8,10 @@ class Pawn < Piece
     position[0] == (color == 'white' ? 6 : 1)
   end
 
+  def direction
+    color == 'white' ? -1 : 1
+  end
+
   def moves
     # Logic for calculating valid moves for a pawn
     [*front_moves, *diagonal_moves]
@@ -15,7 +19,6 @@ class Pawn < Piece
 
   def front_moves # rubocop:disable Metrics/AbcSize
     moves = []
-    direction = color == 'white' ? -1 : 1
 
     if game.board[position[0] + direction][position[1]].nil?
       moves << [position[0] + direction, position[1]]
@@ -27,19 +30,17 @@ class Pawn < Piece
     moves
   end
 
-  def diagonal_moves # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+  def diagonal_moves # rubocop:disable Metrics/AbcSize
     moves = []
-    direction = color == 'white' ? -1 : 1
 
     [[direction, 1], [direction, -1]].each do |move|
-      next if game.board[position[0] + move[0]][position[1] + move[1]].nil?
+      checked_position = [position[0] + move[0], position[1] + move[1]]
 
-      piece = game.board[position[0] + move[0]][position[1] + move[1]]
+      piece = game.board[checked_position[0]][checked_position[1]]
 
-      if !piece.nil? && piece.color != color
-        moves << [position[0] + move[0],
-                  position[1] + move[1]]
-      end
+      next if piece.nil? && game.en_passant_square != checked_position
+
+      moves << checked_position if piece&.color != color
     end
 
     moves
@@ -47,6 +48,12 @@ class Pawn < Piece
 
   def move(destination) # rubocop:disable Metrics/AbcSize
     raise ArgumentError, 'Invalid move' unless moves.include?(destination)
+
+    if destination == game.en_passant_square
+      taken_pawn = game.board[destination[0] - direction][destination[1]]
+      game.taken_pieces[taken_pawn.color.to_sym] << taken_pawn
+      game.board[destination[0] - direction][destination[1]] = nil
+    end
 
     game.board[position[0]][position[1]] = nil
     self.position = destination
