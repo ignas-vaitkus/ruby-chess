@@ -67,6 +67,12 @@ RSpec.describe Pawn do
       pawn = chess.board[3][4]
       expect(pawn.moves_after_check).to eq([[2, 4]])
     end
+
+    it 'returns moves that do not leave save the king from check' do
+      chess = Chess.new('4k3/8/4r3/3P4/8/8/8/4K3 w')
+      pawn = chess.board[3][3]
+      expect(pawn.moves_after_check).to eq([[2, 4]])
+    end
   end
 
   describe '#move' do
