@@ -4,10 +4,6 @@ require_relative 'piece'
 
 # Rook class
 class Rook < Piece
-  def valid_moves
-    # Logic for rook's possible moves
-  end
-
   def moves
     DIRECTIONS.slice(:up, :down, :left, :right).flat_map(&iterate_direction(true))
   end
