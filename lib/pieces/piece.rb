@@ -49,6 +49,7 @@ class Piece
 
   def take
     game.taken_pieces[color.to_sym] << self
+    game.pieces_on_board[color.to_sym].delete(self)
     self.own_square = nil
     self.position = nil
   end

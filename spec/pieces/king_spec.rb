@@ -21,24 +21,24 @@ RSpec.describe King do
 
   describe '#in_check?' do
     it 'returns true if the king is in check' do
-      king = Chess.new('3rk3/8/8/8/3K4/8/8/8 w').kings['white']
+      king = Chess.new(starting_position: '3rk3/8/8/8/3K4/8/8/8 w').kings['white']
       expect(king.in_check?).to be true
     end
 
     it 'returns false if the king is not in check' do
-      king = Chess.new('4k3/8/8/8/8/8/8/4K3 b').kings['black']
+      king = Chess.new(starting_position: '4k3/8/8/8/8/8/8/4K3 b').kings['black']
       expect(king.in_check?).to be false
     end
   end
 
   describe '#moves' do
     it 'returns the correct moves for a king in the center of the board' do
-      king = Chess.new('k7/8/8/3K4/8/8/8/8').kings['white']
+      king = Chess.new(starting_position: 'k7/8/8/3K4/8/8/8/8').kings['white']
       expect(king.moves).to contain_exactly([2, 2], [2, 3], [2, 4], [3, 2], [3, 4], [4, 2], [4, 3], [4, 4])
     end
 
     context 'when kings are in the corners' do
-      let(:chess) { Chess.new('k7/8/8/8/8/8/8/7K') }
+      let(:chess) { Chess.new(starting_position: 'k7/8/8/8/8/8/8/7K') }
 
       it 'returns the correct moves for a king in the top left corner' do
         king = chess.kings['black']

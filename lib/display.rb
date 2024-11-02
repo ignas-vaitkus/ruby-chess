@@ -2,12 +2,14 @@
 
 # Interface for displaying the board and match messages
 class Display
-  attr_reader :game
+  attr_reader :game, :system_caller, :exit_caller
 
   UPPER_LOWER_BOARD = " abcdefgh\n"
 
-  def initialize(game)
+  def initialize(game, system_caller: method(:system), exit_caller: method(:exit))
     @game = game
+    @system_caller = system_caller
+    @exit_caller = exit_caller
   end
 
   # Prints the board with the pieces in their current positions
@@ -37,23 +39,24 @@ class Display
   end
 
   def print_beginning
-    system('clear')
+    system_caller.call('clear')
     puts "\n\nWelcome to Chess!\n\n"
   end
 
   def clear_and_print_header
     return unless game.retries.positive? || !game.moves.empty?
 
-    system('clear')
+    system_caller.call('clear')
     puts "\n\n\n\n"
   end
 
-  def print_turn_info
+  def print_turn_info(end_game: false, end_game_message: nil)
     clear_and_print_header
     puts board_to_s
     puts "\n"
-    puts game.message || "\n"
+    puts end_game ? "\n" : (game.message || "\n")
     puts "\n"
-    puts "#{game.current_player.capitalize}, enter your move:\n\n"
+    puts end_game ? end_game_message : "#{game.current_player.capitalize}, enter your move:\n\n"
+    exit_caller.call if end_game
   end
 end

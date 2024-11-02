@@ -2,12 +2,14 @@
 
 require 'rspec'
 require_relative '../lib/pieces/rook'
+require_relative '../lib/chess'
 require_relative '../lib/display'
 
 RSpec.describe Display do
   let(:empty_board) { Array.new(8) { Array.new(8) } }
+  let(:mock_system) { double('system', call: nil) } # rubocop:disable RSpec/VerifiedDoubles
   let(:chess) do
-    Chess.new
+    Chess.new(system_caller: mock_system)
   end
 
   describe '#board_to_s' do

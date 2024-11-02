@@ -9,9 +9,10 @@ class Chess
   attr_accessor :current_player, :moves, :pieces_on_board, :taken_pieces,
                 :message, :retries, :kings, :en_passant_square
 
-  def initialize(starting_position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w') # rubocop:disable Metrics/MethodLength
+  def initialize(starting_position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w', system_caller: method(:system), # rubocop:disable Metrics/MethodLength
+                 exit_caller: method(:exit))
     @board = Array.new(8) { Array.new(8) }
-    @display = Display.new(self)
+    @display = Display.new(self, system_caller: system_caller, exit_caller: exit_caller)
 
     starting_piece_placement, current_player_letter = starting_position.split
     @current_player = current_player_letter == 'w' ? 'white' : 'black'
@@ -50,10 +51,22 @@ class Chess
     end
   end
 
+  def valid_moves?
+    pieces_on_board[current_player.to_sym].any? { |piece| !piece.moves_after_check.empty? }
+  end
+
   def handle_turn_end
     self.current_player = current_player == 'white' ? 'black' : 'white'
     self.retries = 0
     self.message = nil
+  end
+
+  def handle_game_end
+    return if valid_moves?
+
+    message = "#{current_player.capitalize} is in stalemate, game over!"
+    message = "#{current_player.capitalize} is in checkmate, game over!" if kings[current_player].in_check?
+    display.print_turn_info(end_game: true, end_game_message: message)
   end
 
   def play_turn
@@ -61,6 +74,7 @@ class Chess
     input = gets.chomp
     handle_input(input)
     handle_turn_end
+    handle_game_end
     play_turn
   rescue StandardError => e
     self.retries += 1

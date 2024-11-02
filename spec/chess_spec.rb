@@ -6,6 +6,9 @@ require_relative '../lib/chess'
 describe Chess do
   subject(:chess) { described_class.new }
 
+  let(:mock_system) { double('system', call: nil) } # rubocop:disable RSpec/VerifiedDoubles
+  let(:mock_exit) { double('exit', call: nil) } # rubocop:disable RSpec/VerifiedDoubles
+
   describe '#valid_coordinate_notation_move' do
     it 'returns nil for a valid move' do
       expect(chess.send(:valid_coordinate_notation_move, 'E2-E6')).to be_nil
@@ -37,7 +40,7 @@ describe Chess do
   end
 
   describe '.en_passant_square' do
-    let(:chess) { described_class.new }
+    let(:chess) { described_class.new(system_caller: mock_system) }
 
     it 'is set after pawn moves 2 squares' do
       chess.send(:handle_input, 'E2-E4')
@@ -52,11 +55,24 @@ describe Chess do
     end
 
     it 'allows for en passant capture' do
-      chess = described_class.new('4k3/3p4/8/4P3/8/8/8/4K3 b')
+      chess = described_class.new(starting_position: '4k3/3p4/8/4P3/8/8/8/4K3 b', system_caller: mock_system)
       chess.send(:handle_input, 'D7-D5')
       chess.send(:handle_turn_end)
       chess.send(:handle_input, 'E5-D6')
       expect(chess.board[3][3]).to be_nil
+    end
+  end
+
+  describe '#handle_game_end' do
+    it 'ends the game when the king is in checkmate' do # rubocop:disable RSpec/ExampleLength
+      chess = described_class.new(starting_position: 'rnbqkbnr/pppp1ppp/8/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w',
+                                  system_caller: mock_system, exit_caller: mock_exit)
+      chess.send(:handle_input, 'F3-F7')
+      chess.send(:handle_turn_end)
+
+      expected_output = "\n\n\n\n abcdefgh\n8♖♘♗♕♔♗♘♖8\n7♙♙♙♙□♛♙♙7\n6■□■□■□■□6\n5□■□■♙■□■5\n4■□♝□♟︎□■□4\n3□■□■□■□■3\n2♟︎♟︎♟︎♟︎■♟︎♟︎♟︎2\n1♜♞♝■♚■♞♜1\n abcdefgh\n\n\n\nBlack is in checkmate, game over!\n" # rubocop:disable Layout/LineLength
+
+      expect { chess.send(:handle_game_end) }.to output(expected_output).to_stdout
     end
   end
 end
