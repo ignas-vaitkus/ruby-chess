@@ -46,4 +46,10 @@ class Piece
       moves
     end
   end
+
+  def take
+    game.taken_pieces[color.to_sym] << self
+    game.board[position[0]][position[1]] = nil
+    self.position = nil
+  end
 end

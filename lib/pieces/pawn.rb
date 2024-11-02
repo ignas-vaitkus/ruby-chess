@@ -51,9 +51,10 @@ class Pawn < Piece
 
     if destination == game.en_passant_square
       taken_pawn = game.board[destination[0] - direction][destination[1]]
-      game.taken_pieces[taken_pawn.color.to_sym] << taken_pawn
-      game.board[destination[0] - direction][destination[1]] = nil
+      taken_pawn.take
     end
+
+    game.board[destination[0]][destination[1]]&.take
 
     game.board[position[0]][position[1]] = nil
     self.position = destination

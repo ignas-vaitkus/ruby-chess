@@ -9,7 +9,7 @@ class Chess
   attr_accessor :current_player, :moves, :pieces_on_board, :taken_pieces,
                 :message, :retries, :kings, :en_passant_square
 
-  def initialize(starting_position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w')
+  def initialize(starting_position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w') # rubocop:disable Metrics/MethodLength
     @board = Array.new(8) { Array.new(8) }
     @display = Display.new(self)
 
@@ -36,7 +36,7 @@ class Chess
   end
 
   # parse the FEN notation rank and place the pieces on the board
-  def parse_fen_row(rank, file) # rubocop:disable Metrics/MethodLength
+  def parse_fen_row(rank, file) # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
     lambda do |char|
       if char.match?(/\d/)
         file += char.to_i
