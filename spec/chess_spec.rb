@@ -74,5 +74,16 @@ describe Chess do
 
       expect { chess.send(:handle_game_end) }.to output(expected_output).to_stdout
     end
+
+    it 'ends the game when the king is in stalemate' do # rubocop:disable RSpec/ExampleLength
+      chess = described_class.new(starting_position: 'k7/8/8/1Q6/8/8/2R5/1R2K3 w',
+                                  system_caller: mock_system, exit_caller: mock_exit)
+      chess.send(:handle_input, 'B5-B6')
+      chess.send(:handle_turn_end)
+
+      expected_output = "\n\n\n\n abcdefgh\n8♔□■□■□■□8\n7□■□■□■□■7\n6■♛■□■□■□6\n5□■□■□■□■5\n4■□■□■□■□4\n3□■□■□■□■3\n2■□♜□■□■□2\n1□♜□■♚■□■1\n abcdefgh\n\n\n\nBlack is in stalemate, game over!\n" # rubocop:disable Layout/LineLength
+
+      expect { chess.send(:handle_game_end) }.to output(expected_output).to_stdout
+    end
   end
 end
