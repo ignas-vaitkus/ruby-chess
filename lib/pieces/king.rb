@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# frozen_string_literal: false
 
 require_relative 'knight'
 require_relative 'piece'
@@ -47,6 +47,16 @@ class King < Piece
 
       checked_position
     end.compact
+  end
+
+  def move(destination)
+    super
+
+    rights = 'kq'
+
+    rights.upcase! if color == 'white'
+
+    game.send(:take_castling_rights, rights)
   end
 
   def to_s

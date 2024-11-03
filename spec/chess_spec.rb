@@ -55,7 +55,7 @@ describe Chess do
     end
 
     it 'allows for en passant capture' do
-      chess = described_class.new(starting_position: '4k3/3p4/8/4P3/8/8/8/4K3 b', system_caller: mock_system)
+      chess = described_class.new(starting_position: '4k3/3p4/8/4P3/8/8/8/4K3 b -', system_caller: mock_system)
       chess.send(:handle_input, 'D7-D5')
       chess.send(:handle_turn_end)
       chess.send(:handle_input, 'E5-D6')
@@ -63,9 +63,58 @@ describe Chess do
     end
   end
 
+  describe '.castling_rights' do
+    let(:chess) { described_class.new(system_caller: mock_system) }
+
+    it 'is KQkq at the start of the game' do
+      expect(chess.castling_rights).to eq('KQkq')
+    end
+
+    it 'is set to kq after the white king moves' do # rubocop:disable RSpec/ExampleLength
+      chess.send(:handle_input, 'E2-E4')
+      chess.send(:handle_turn_end)
+      chess.send(:handle_input, 'E7-E5')
+      chess.send(:handle_turn_end)
+      chess.send(:handle_input, 'E1-E2')
+      expect(chess.castling_rights).to eq('kq')
+    end
+
+    it 'is set to Qkq after the kingside rook moves' do # rubocop:disable RSpec/ExampleLength
+      chess.send(:handle_input, 'H2-H4')
+      chess.send(:handle_turn_end)
+      chess.send(:handle_input, 'H7-H5')
+      chess.send(:handle_turn_end)
+      chess.send(:handle_input, 'H1-H2')
+      expect(chess.castling_rights).to eq('Qkq')
+    end
+
+    it 'is set to - after the both kings move' do # rubocop:disable RSpec/ExampleLength
+      chess.send(:handle_input, 'E2-E4')
+      chess.send(:handle_turn_end)
+      chess.send(:handle_input, 'E7-E5')
+      chess.send(:handle_turn_end)
+      chess.send(:handle_input, 'E1-E2')
+      chess.send(:handle_turn_end)
+      chess.send(:handle_input, 'E8-E7')
+      expect(chess.castling_rights).to eq('-')
+    end
+  end
+
+  describe '#take_castling_rights' do
+    it 'removes castling rights for the given side' do
+      chess.send(:take_castling_rights, 'K')
+      expect(chess.castling_rights).to eq('Qkq')
+    end
+
+    it 'removes castling rights for both sides' do
+      chess.send(:take_castling_rights, 'KQ')
+      expect(chess.castling_rights).to eq('kq')
+    end
+  end
+
   describe '#handle_game_end' do
     it 'ends the game when the king is in checkmate' do # rubocop:disable RSpec/ExampleLength
-      chess = described_class.new(starting_position: 'rnbqkbnr/pppp1ppp/8/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w',
+      chess = described_class.new(starting_position: 'rnbqkbnr/pppp1ppp/8/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq',
                                   system_caller: mock_system, exit_caller: mock_exit)
       chess.send(:handle_input, 'F3-F7')
       chess.send(:handle_turn_end)
@@ -76,7 +125,7 @@ describe Chess do
     end
 
     it 'ends the game when the king is in stalemate' do # rubocop:disable RSpec/ExampleLength
-      chess = described_class.new(starting_position: 'k7/8/8/1Q6/8/8/2R5/1R2K3 w',
+      chess = described_class.new(starting_position: 'k7/8/8/1Q6/8/8/2R5/1R2K3 w -',
                                   system_caller: mock_system, exit_caller: mock_exit)
       chess.send(:handle_input, 'B5-B6')
       chess.send(:handle_turn_end)

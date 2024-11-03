@@ -4,29 +4,34 @@ require_relative 'display'
 require_relative 'pieces/piece_factory'
 
 # The chess game class
-class Chess
+class Chess # rubocop:disable Metrics/ClassLength
   attr_reader :board, :display
   attr_accessor :current_player, :moves, :pieces_on_board, :taken_pieces,
-                :message, :retries, :kings, :en_passant_square
+                :message, :retries, :kings, :en_passant_square, :castling_rights
 
-  def initialize(starting_position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w', system_caller: method(:system), # rubocop:disable Metrics/MethodLength
-                 exit_caller: method(:exit))
+  private
+
+  def initialize(starting_position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq',
+                 system_caller: method(:system), exit_caller: method(:exit))
     @board = Array.new(8) { Array.new(8) }
     @display = Display.new(self, system_caller: system_caller, exit_caller: exit_caller)
 
-    starting_piece_placement, current_player_letter = starting_position.split
+    starting_piece_placement, current_player_letter, self.castling_rights = starting_position.split
     @current_player = current_player_letter == 'w' ? 'white' : 'black'
 
+    initialize_empty_variables
+
+    place_pieces(starting_piece_placement)
+  end
+
+  def initialize_empty_variables
     @pieces_on_board = { white: [], black: [] }
     @taken_pieces = { white: [], black: [] }
     @kings = {}
     @en_passant_square = nil
     @moves = []
-    place_pieces(starting_piece_placement)
     @retries = 0
   end
-
-  private
 
   # NOTE: that the starting_position is a string in FEN notation and is not validated
   def place_pieces(starting_piece_placement)
@@ -36,16 +41,20 @@ class Chess
     end
   end
 
+  def place_piece(rank, file, char)
+    piece = PieceFactory.create_piece(self, char, [rank, file])
+    pieces_on_board[piece.color.to_sym] << piece
+    kings[piece.color] = piece if piece.is_a?(King)
+    board[rank][file] = piece
+  end
+
   # parse the FEN notation rank and place the pieces on the board
-  def parse_fen_row(rank, file) # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
+  def parse_fen_row(rank, file)
     lambda do |char|
       if char.match?(/\d/)
         file += char.to_i
       else
-        piece = PieceFactory.create_piece(self, char, [rank, file])
-        pieces_on_board[piece.color.to_sym] << piece
-        kings[piece.color] = piece if piece.is_a?(King)
-        board[rank][file] = piece
+        place_piece(rank, file, char)
         file += 1
       end
     end
@@ -116,6 +125,14 @@ class Chess
     raise ArgumentError, 'Not your piece.' if piece.color != current_player
 
     piece
+  end
+
+  def take_castling_rights(letter)
+    castling_rights.gsub!(letter, '')
+
+    return unless castling_rights.empty?
+
+    castling_rights << '-' # no castling rights
   end
 
   public

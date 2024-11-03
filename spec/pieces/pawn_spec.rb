@@ -55,7 +55,7 @@ RSpec.describe Pawn do
 
   describe '#diagonal_moves' do
     it 'returns the correct moves for a white pawn that can take' do
-      chess = Chess.new(starting_position: '4k3/8/8/4p3/3P4/8/8/4K3 w')
+      chess = Chess.new(starting_position: '4k3/8/8/4p3/3P4/8/8/4K3 w -')
       pawn = chess.board[4][3]
       expect(pawn.diagonal_moves).to eq([[3, 4]])
     end
@@ -63,13 +63,13 @@ RSpec.describe Pawn do
 
   describe '#moves_after_check' do
     it 'returns moves that do not leave the king in check' do
-      chess = Chess.new(starting_position: '4k3/4r3/3p4/4P3/8/8/8/4K3 w')
+      chess = Chess.new(starting_position: '4k3/4r3/3p4/4P3/8/8/8/4K3 w -')
       pawn = chess.board[3][4]
       expect(pawn.moves_after_check).to eq([[2, 4]])
     end
 
     it 'returns moves that do not leave save the king from check' do
-      chess = Chess.new(starting_position: '4k3/8/4r3/3P4/8/8/8/4K3 w')
+      chess = Chess.new(starting_position: '4k3/8/4r3/3P4/8/8/8/4K3 w -')
       pawn = chess.board[3][3]
       expect(pawn.moves_after_check).to eq([[2, 4]])
     end
