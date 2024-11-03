@@ -11,14 +11,22 @@ class Rook < Piece
     @side = position[1].zero? ? :queen : :king
   end
 
-  def move(destination)
-    super
-
+  def take_castling_rights
     rights = side == :queen ? 'q' : 'k'
 
     rights.upcase! if color == 'white'
 
     game.send(:take_castling_rights, rights)
+  end
+
+  def move(destination)
+    super
+    take_castling_rights
+  end
+
+  def take
+    super
+    take_castling_rights
   end
 
   def moves
