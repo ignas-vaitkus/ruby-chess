@@ -46,17 +46,70 @@ class King < Piece
       next if piece&.color == color
 
       checked_position
-    end.compact
+    end.compact + castling_moves
   end
 
-  def move(destination)
-    super
+  def castling_letter(is_king_side)
+    if color == 'white'
+      is_king_side ? 'K' : 'Q'
+    else
+      is_king_side ? 'k' : 'q'
+    end
+  end
 
+  def check_if_side_clear(is_king_side)
+    range = is_king_side ? (position[1] + 1)...7 : 1...position[1]
+    game.board[position[0]][range].each do |square|
+      return false unless square.nil?
+    end
+    true
+  end
+
+  def side_castle_move(is_king_side) # rubocop:disable Metrics/AbcSize
+    direction = is_king_side ? 1 : -1
+    letter = castling_letter(is_king_side)
+
+    castling_destination = [position[0], position[1] + (2 * direction)]
+    castling_path = [[position[0], position[1] + direction], castling_destination]
+
+    if game.castling_rights.include?(letter) && check_if_side_clear(is_king_side) && castling_path == moves_after_check(castling_path) && !in_check? # rubocop:disable Layout/LineLength
+      castling_destination
+    end
+  end
+
+  def castling_moves
+    [side_castle_move(true), side_castle_move(false)].compact
+  end
+
+  def take_castling_rights
     rights = 'kq'
 
     rights.upcase! if color == 'white'
 
     game.send(:take_castling_rights, rights)
+  end
+
+  def castle_queen_side
+    game.board[position[0]][0].move_without_validation([position[0], 3])
+  end
+
+  def castle_king_side
+    game.board[position[0]][7].move_without_validation([position[0], 5])
+  end
+
+  def move(destination)
+    castling = true if (position[1] - destination[1]).abs > 1
+    is_queen_side_castle = (position[1] - destination[1]).positive?
+
+    super
+
+    if castling && is_queen_side_castle
+      castle_queen_side
+    elsif castling
+      castle_king_side
+    end
+
+    take_castling_rights
   end
 
   def to_s

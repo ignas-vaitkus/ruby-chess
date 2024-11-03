@@ -67,7 +67,7 @@ class Piece
   end
 
   # moves_after_check is used to filter out moves that would leave the king in check
-  def moves_after_check # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+  def moves_after_check(moves = self.moves) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     moves.select do |move|
       # Check if is an en passant move
       en_passant_move = is_a?(Pawn) && move == game.en_passant_square

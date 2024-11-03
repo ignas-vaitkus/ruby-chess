@@ -112,6 +112,31 @@ describe Chess do
     end
   end
 
+  describe 'castling' do
+    it 'allows for kingside castling' do
+      chess = described_class.new(starting_position: '4k3/8/8/8/8/8/8/R3K2R w KQ', system_caller: mock_system)
+      chess.send(:handle_input, 'E1-G1')
+      expect(chess.board[7][6]).to be_instance_of(King)
+    end
+
+    it 'allows for queenside castling' do
+      chess = described_class.new(starting_position: '4k3/8/8/8/8/8/8/R3K2R w KQ', system_caller: mock_system)
+      chess.send(:handle_input, 'E1-C1')
+      expect(chess.board[7][2]).to be_instance_of(King)
+    end
+
+    it 'allows black to castle queenside' do
+      chess = described_class.new(starting_position: 'r3k2r/8/8/8/8/8/8/4KR2 b kq', system_caller: mock_system)
+      chess.send(:handle_input, 'E8-C8')
+      expect(chess.board[0][2]).to be_instance_of(King)
+    end
+
+    it 'does not allow black to castle kingside if the path is covered' do
+      chess = described_class.new(starting_position: 'r3k2r/8/8/8/8/8/8/4KR2 b kq', system_caller: mock_system)
+      expect { chess.send(:handle_input, 'E8-G8') }.to raise_error(ArgumentError, 'Invalid move')
+    end
+  end
+
   describe '#handle_game_end' do
     it 'ends the game when the king is in checkmate' do # rubocop:disable RSpec/ExampleLength
       chess = described_class.new(starting_position: 'rnbqkbnr/pppp1ppp/8/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq',
