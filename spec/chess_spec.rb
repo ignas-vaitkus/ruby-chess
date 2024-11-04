@@ -137,6 +137,32 @@ describe Chess do
     end
   end
 
+  describe 'promoting' do
+    it 'does not allow promoting a piece that is not a pawn' do
+      chess = described_class.new(starting_position: '4k3/P7/8/8/8/8/8/4K3 w -', system_caller: mock_system)
+      expect { chess.send(:handle_input, 'E1-E2(Q)') }.to raise_error(ArgumentError, 'Cannot promote this piece')
+    end
+
+    it 'does not allow promoting a pawn that is not at the end' do
+      chess = described_class.new(starting_position: '4k3/8/P7/8/8/8/8/4K3 w -', system_caller: mock_system)
+      expect do
+        chess.send(:handle_input, 'A6-A7(Q)')
+      end.to raise_error(ArgumentError, 'Promotion is not allowed for this move.')
+    end
+
+    it 'promotes a pawn to a queen' do
+      chess = described_class.new(starting_position: '4k3/P7/8/8/8/8/8/4K3 w -', system_caller: mock_system)
+      chess.send(:handle_input, 'A7-A8(Q)')
+      expect(chess.board[0][0]).to be_instance_of(Queen)
+    end
+
+    it 'promotes a pawn to a rook by taking' do
+      chess = described_class.new(starting_position: '1bk3/P7/8/8/8/8/8/4K3 w -', system_caller: mock_system)
+      chess.send(:handle_input, 'A7-B8(R)')
+      expect(chess.board[0][1]).to be_instance_of(Rook)
+    end
+  end
+
   describe '#kings_left?' do
     it 'returns true when there are two kings left' do
       chess = described_class.new(starting_position: '4k3/8/8/8/8/8/8/4K3 w -',

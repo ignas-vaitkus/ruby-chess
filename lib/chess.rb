@@ -104,29 +104,35 @@ class Chess # rubocop:disable Metrics/ClassLength
   end
 
   def valid_coordinate_notation_move(move)
-    return if move.match?(/^[A-H][1-8]-[A-H][1-8]$/)
+    return if move.match?(/^[A-H][1-8]-[A-H][1-8](\([BNQR]\))?$/)
 
     raise ArgumentError, 'Invalid input, use coordinate notation, for example "A2-A4", "B1-C3", etc.'
   end
 
-  def pick_start_and_destination(move)
+  def parse_chess_move(move)
+    move, promotion = move.split('(')
+    promotion = promotion&.chop
     move.split('-').map do |position|
       [8 - position[1].to_i, position[0].ord - 65]
-    end
+    end << promotion
   end
 
-  def handle_input(move) # rubocop:disable Metrics/AbcSize
-    valid_coordinate_notation_move(move)
-    start, destination = pick_start_and_destination(move)
-    piece = pick_piece(start)
-    piece.move(destination)
-
+  def handle_en_passant_square(piece, start, destination)
     self.en_passant_square = nil
 
     # If a pawn moved two squares, set the en passant square
-    if piece.is_a?(Pawn) && (piece.position[0] - start[0]).abs == 2
-      self.en_passant_square = [(destination[0] + start[0]) / 2, destination[1]]
-    end
+    return unless piece.is_a?(Pawn) && (piece.position[0] - start[0]).abs == 2
+
+    self.en_passant_square = [(destination[0] + start[0]) / 2, destination[1]]
+  end
+
+  def handle_input(move)
+    valid_coordinate_notation_move(move)
+    start, destination, promotion = parse_chess_move(move)
+    piece = pick_piece(start)
+    piece.move(destination, promotion)
+
+    handle_en_passant_square(piece, start, destination)
 
     moves << { destination: destination, start: start, piece: piece }
   end

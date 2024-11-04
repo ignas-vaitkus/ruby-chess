@@ -97,7 +97,7 @@ class King < Piece
     game.board[position[0]][7].move_without_validation([position[0], 5])
   end
 
-  def move(destination)
+  def move(destination, _promotion = nil)
     castling = true if (position[1] - destination[1]).abs > 1
     is_queen_side_castle = (position[1] - destination[1]).positive?
 

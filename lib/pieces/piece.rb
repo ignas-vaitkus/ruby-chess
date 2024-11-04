@@ -100,7 +100,8 @@ class Piece
     self.own_square = self
   end
 
-  def move(destination)
+  def move(destination, promotion = nil)
+    raise ArgumentError, 'Cannot promote this piece' unless promotion.nil?
     raise ArgumentError, 'Invalid move' unless moves_after_check.include?(destination)
 
     game.board[destination[0]][destination[1]]&.take

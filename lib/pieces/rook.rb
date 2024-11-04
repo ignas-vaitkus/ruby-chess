@@ -19,7 +19,7 @@ class Rook < Piece
     game.send(:take_castling_rights, rights)
   end
 
-  def move(destination)
+  def move(destination, _promotion = nil)
     super
     take_castling_rights
   end
