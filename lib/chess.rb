@@ -60,21 +60,33 @@ class Chess # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def valid_moves?
-    pieces_on_board[current_player.to_sym].any? { |piece| !piece.moves_after_check.empty? }
-  end
-
   def handle_turn_end
     self.current_player = current_player == 'white' ? 'black' : 'white'
     self.retries = 0
     self.message = nil
   end
 
-  def handle_game_end
-    return if valid_moves?
+  def valid_moves?
+    pieces_on_board[current_player.to_sym].any? { |piece| !piece.moves_after_check.empty? }
+  end
 
-    message = "#{current_player.capitalize} is in stalemate, game over!"
-    message = "#{current_player.capitalize} is in checkmate, game over!" if kings[current_player].in_check?
+  def kings_left?
+    pieces_on_board.values.flatten.all? { |piece| piece.is_a?(King) }
+  end
+
+  def end_game_message
+    message = "#{current_player.capitalize} is in stalemate, game over!" unless kings_left?
+    message = 'The game is a draw, game over!' if valid_moves? && kings_left?
+    if !valid_moves? && kings[current_player].in_check?
+      message = "#{current_player.capitalize} is in checkmate, game over!"
+    end
+    message
+  end
+
+  def handle_game_end
+    return if valid_moves? && !kings_left?
+
+    message = end_game_message
     display.print_turn_info(end_game: true, end_game_message: message)
   end
 

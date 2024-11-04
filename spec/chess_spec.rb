@@ -137,6 +137,21 @@ describe Chess do
     end
   end
 
+  describe '#kings_left?' do
+    it 'returns true when there are two kings left' do
+      chess = described_class.new(starting_position: '4k3/8/8/8/8/8/8/4K3 w -',
+                                  system_caller: mock_system, exit_caller: mock_exit)
+
+      expect(chess.send(:kings_left?)).to be true
+    end
+
+    it 'returns false when there are pieces that are not king' do
+      chess = described_class.new(starting_position: '4k3/8/8/8/8/8/4r3/4K3 w -',
+                                  system_caller: mock_system, exit_caller: mock_exit)
+      expect(chess.send(:kings_left?)).to be false
+    end
+  end
+
   describe '#handle_game_end' do
     it 'ends the game when the king is in checkmate' do # rubocop:disable RSpec/ExampleLength
       chess = described_class.new(starting_position: 'rnbqkbnr/pppp1ppp/8/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq',
@@ -156,6 +171,17 @@ describe Chess do
       chess.send(:handle_turn_end)
 
       expected_output = "\n\n\n\n abcdefgh\n8♔□■□■□■□8\n7□■□■□■□■7\n6■♛■□■□■□6\n5□■□■□■□■5\n4■□■□■□■□4\n3□■□■□■□■3\n2■□♜□■□■□2\n1□♜□■♚■□■1\n abcdefgh\n\n\n\nBlack is in stalemate, game over!\n" # rubocop:disable Layout/LineLength
+
+      expect { chess.send(:handle_game_end) }.to output(expected_output).to_stdout
+    end
+
+    it 'ends the game when there is only kings left' do # rubocop:disable RSpec/ExampleLength
+      chess = described_class.new(starting_position: '4k3/8/8/8/8/8/4r3/4K3 w -',
+                                  system_caller: mock_system, exit_caller: mock_exit)
+      chess.send(:handle_input, 'E1-E2')
+      chess.send(:handle_turn_end)
+
+      expected_output = "\n\n\n\n abcdefgh\n8■□■□♔□■□8\n7□■□■□■□■7\n6■□■□■□■□6\n5□■□■□■□■5\n4■□■□■□■□4\n3□■□■□■□■3\n2■□■□♚□■□2\n1□■□■□■□■1\n abcdefgh\n\n\n\nThe game is a draw, game over!\n" # rubocop:disable Layout/LineLength
 
       expect { chess.send(:handle_game_end) }.to output(expected_output).to_stdout
     end
